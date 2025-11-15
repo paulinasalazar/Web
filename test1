@@ -9,6 +9,7 @@
       --bg: #0f172a;
       --text: #e5e7eb;
       --muted: #94a3b8;
+      --ring: #334155;
     }
   *{ box-sizing:border-box; }
   html, body {100%}
@@ -33,7 +34,28 @@
   h1 {font-size: 24px; margin: 0 auto; letter-spacing: 0.3px; }
   .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
   .nav {   
-    display:flex; gap: 8px; align-center
+    display:flex; gap: 8px; align-items: center;
+  }
+  .btn {
+    backround: #0b1220;
+    border: 1px solid var(--ring);
+    padding: 8px 12px;
+    border - radius: 12px;
+    border radius: 12 px;
+    cursor:pointer;
+    transition: transform .05s ease, border-cpolor .2s ease;
+    user-select:none
+  }
+  .btn:hover {border-color: #475569; }
+  .btn:active {transform:translateY (1px);}
+  .calendar {
+    Backround: #0b1120;
+    border: 1px solid var(--ring);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+
     
   
     
