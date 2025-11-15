@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset = "UTF-8">
+  <meta name = "viewport" content = "width-device-width", initial-scale = 1"
+  <title> Calendario </title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+    }
+  *{ box-sizing:border-box; }
+  html, body {100%}
+  body {
+    margin: 0;
+    font family: ui-sans-srif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segeo UI Emoji";
+    backround: radial-gradient(1200px 800px at 10% -10%, #1e293b 0, #0b1220 50%, #060b13 100%), var(--bg);
+    color: var (--text);
+  }
+  .container {
+    max-width: 1100px;
+    margin: 32px auto 80px;
+    padding: 0 16px;
+  }
+  header {
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  h1 {font-size: 24px; margin: 0 auto; letter-spacing: 0.3px; }
+  .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .nav {   
+    display:flex; gap: 8px; align-center
+    
+  
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
