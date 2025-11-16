@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset = "UTF-8">
+  <meta name = "viewport" content = "width-device-width", initial-scale = 1"
+  <title> Calendario </title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --ring: #334155;
+      -ok: #22c55e;
+      --warn: #f59e0b;
+    }
+  *{ box-sizing:border-box; }
+  html, body {100%}
+  body {
+    margin: 0;
+    font family: ui-sans-srif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segeo UI Emoji";
+    backround: radial-gradient(1200px 800px at 10% -10%, #1e293b 0, #0b1220 50%, #060b13 100%), var(--bg);
+    color: var (--text);
+  }
+  .container {
+    max-width: 1100px;
+    margin: 32px auto 80px;
+    padding: 0 16px;
+  }
+  header {
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  h1 {font-size: 24px; margin: 0 auto; letter-spacing: 0.3px; }
+  .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .nav {   
+    display:flex; gap: 8px; align-items: center;
+  }
+  .btn {
+    backround: #0b1220;
+    border: 1px solid var(--ring);
+    padding: 8px 12px;
+    border - radius: 12px;
+    border radius: 12 px;
+    cursor:pointer;
+    transition: transform .05s ease, border-cpolor .2s ease;
+    user-select:none
+  }
+  .btn:hover {border-color: #475569; }
+  .btn:active {transform:translateY (1px);}
+  .calendar {
+    Backround: #0b1120;
+    border: 1px solid var(--ring);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  .weekdays, .grid div {
+    display: grid;                      
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+  }  
+  .weedays div{
+    text-align: center; color: var(--muted); font size: 12px; letter-spacing: .5px; text-transform: uppercase;
+  }
+  .day {
+    border: 1px; solid var(--ring);
+    border-radius: 14px;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items:flex-start; 
+    justify-content: flex-end;
+    padding: 8px; 
+    position: relative; 
+    background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+    cursor: pointer; /* Clickable */
+    transition: border-color .2s ease, box-shadow .2s ease, transform .06s ease;
+  }
+  .day:hover { border-color: #526581; box-shadow: 0 6px 18px rgba(2,6,23,.35); }
+  .day.disabled { opacity: .3; cursor: default; } 
+  .pill { 
+    position: absolute; bottom: 8px; left: 8px; 
+    display: inline-flex; gap: 6px
+  }
+  .badge { 
+    width: 8px; height: 8px; border-radius: 999px; border: 1px solid var(--ring); 
+    background: #0b1220; 
+  }
+.bage.ok {background: var(--ok); }
+.bade.warn {background: var(--warn); }
+.day.complete { outline: 2px solid rgba(34,197,94,.6); box-shadow: 0 0 0 4px rgba(34,197,94,.12) inset; } 
+.legend { display:flex; gap: 10px; align-items: center; color: var(--muted); font-size: 12px; margin-top: 10px; } /* Leyenda */
+.legend .item { display:flex; gap: 6px; align-items: center; }
+.modal-backdrop { /* Capa oscura tras el modal */
+position: fixed; inset: 0; background: rgba(2,6,23,.7); /* Cubre toda la pantalla */
+display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; /* Centrado */
+}
+.modal-backdrop.show { display: flex; }
+    
