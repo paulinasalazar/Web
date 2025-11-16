@@ -75,7 +75,7 @@
       padding: 8px; 
       position: relative; 
       background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-      cursor: pointer; /* Clickable */
+      cursor: pointer; 
       transition: border-color .2s ease, box-shadow .2s ease, transform .06s ease;
     }
     .day:hover { border-color: #526581; box-shadow: 0 6px 18px rgba(2,6,23,.35); }
@@ -145,7 +145,30 @@
         <button class="btn" id="nextMonth" aria-label="Mes siguiente">▶</button>
       </div>
     </header>
+
+    <div class="calendar">
+        <div class="weekdays">  
+          <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div> 
+        </div> 
+        <div class="grid" id="calendarGrid" style="margin-top:10px"></div> 
+    </div>
+    <div class="modal-backdrop" id="modal">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <header> 
+          <h2 id="modalTitle"> Día </h2>
+        </header>
+        <div class="section" id="sec-ej"  
+          <h3> Dieta </h3>
+          <div class="row">  
+            <div class="sub" style="margin-bottom:6px"> Cereales </div>
+            <div class="grid-mini" id="cerealesDots"></div>
+          </div>
+          <div>
+            <div class="sub" style"margin-bottom: 6px"> Grasas </div>
+            <div class="grid-mini" style="grid-template-columnes: repeat(2,1fr)" id="azucarDots" </div>
         
+          
+      
         
   
 
