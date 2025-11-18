@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset = "UTF-8">
@@ -165,7 +165,7 @@
           </div>
           <div>
             <div class="sub" style=margin-bottom: 6px"> Carne </div
-            <div class="grid-mini" style="grid-template-columns: repeat(7,1fr)" id="azucarDots"> </div>                                                   
+            <div class="grid-mini" style="grid-template-columns: repeat(7,1fr)" id="carneDots"> </div>                                                   
           </div>
           <div>
             <div class="sub" style="margin-bottom: 6px"> Grasas </div>
@@ -174,7 +174,7 @@
           </div>
           <div>
             <div class="sub" style=margin-bottom: 6px"> Verduras </div
-            <div class="grid-mini" style="grid-template-columns: repeat(4,1fr)" id="azucarDots"> </div>                                                   
+            <div class="grid-mini" style="grid-template-columns: repeat(4,1fr)" id="verdurasDots"> </div>                                                   
           </div>
           <div>
             <div class="sub" style="margin-bottom: 6px"> Azúcar </div>
@@ -205,6 +205,138 @@
         </div> 
       </div>
     </div>
+    <script>
+      const pad = n => String(n).pad.Start(2, '0');
+      const ymd = d => `${d.getFullYear()}-{pad(d.getMonth()+1}-$pad.getDate())}`
+      let current = new Date(); // Fecha actual
+      current.setDate(1); // Fijamos el día 1 para centrar el mes visible
+      let selectedKey = null;
+      const defaultDay = () => ({ 
+        ejercicio: false, // Sin ejercicio al inicio
+        suplementos: { vitaminas: false, creatina: false, proteina: false }, // Tres checks
+        dieta: { cereales: [false,false,false,false,false], azucar: [false,false] }, // 5 + 2 puntos
+        hidratacion: false 
+      });
+      function loadDay(key){ // Carga el estado de un día
+        const raw = localStorage.getItem('habit:'+key); // Lee del almacenamiento local
+        return raw ? JSON.parse(raw) : defaultDay(); // Devuelve lo guardado o el default
+      }
+      function saveDay(key, data){ // Guarda el estado de un día
+        localStorage.setItem('habit:'+key, JSON.stringify(data)); 
+      }
+      function clearDay(key){ 
+        localStorage.removeItem('habit:'+key); 
+      }
+      function isCompleteDay(state){ // Regla: cuándo un día está completo (verde)
+        const sup = state.suplementos; // Acceso corto
+        const suplementosOk = sup.vitaminas && sup.creatina && sup.proteina; // Los 3 marcados
+        return state.ejercicio && suplementosOk && state.hidratacion; // Ejercicio + Suplementos + Hidratación
+      }
+      function renderMonth(){ // Dibuja el mes en pantalla
+        const y = current.getFullYear(); // Año actual mostrado
+        const m = current.getMonth(); // Mes actual mostrado
+        monthLabel.textContent = `${monthNames[m]} ${y}`; // Texto "Mes Año"
+        grid.innerHTML = ''; // Limpia la grilla
+        const first = new Date(y, m, 1); // Primer día del mes
+        const last = new Date(y, m+1, 0); // Último día del mes
+
+        const blanks = weekdayOffset(first.getDay()); // Cálculo de huecos
+        for(let i=0;i<blanks;i++){ // Inserta divs vacíos
+        const div = document.createElement('div'); // Crea un hueco
+        grid.appendChild(div); // Lo añade al grid
+      }
+      for(let d=1; d<=last.getDate(); d++){ // Itera cada día numérico
+        const cell = document.createElement('button'); // Crea un botón/celda
+        cell.className = 'day'; // Clase visual de día
+        const date = new Date(y, m, d); // Fecha concreta
+        const key = ymd(date); // Clave YYYY-MM-DD
+        cell.setAttribute('data-key', key); // Guarda la clave en atributo
+        cell.innerHTML = `
+          <span class="day-number">${d}</span>
+          <span class="pill">
+            <span class="badge" data-badge="ej"></span>
+            <span class="badge" data-badge="sup"></span>
+            <span class="badge" data-badge="hid"></span>
+          </span>
+`        ;
+        const state = loadDay(key); 
+        cell.querySelector('[data-badge="ej"]').classList.toggle('ok', state.ejercicio); // Verde si ejercicio
+        const supOk = state.suplementos.vitaminas || state.suplementos.creatina || state.suplementos.proteina; // Algún suplemento marcado
+        cell.querySelector('[data-badge="sup"]').classList.toggle('warn', supOk && ! (state.suplementos.vitaminas && state.suplementos.creatina && state.suplementos.proteina)); // Ámbar si parcial
+        cell.querySelector('[data-badge="sup"]').classList.toggle('ok', state.suplementos.vitaminas && state.suplementos.creatina && state.suplementos.proteina); // Verde si los 3
+        cell.querySelector('[data-badge="hid"]').classList.toggle('ok', state.hidratacion); // Verde si hidratación
+
+        if (isCompleteDay(state)) cell.classList.add('complete'); // Resalta el día si se cumple la regla
+
+
+        cell.addEventListener('click', () => openDayModal(key)); // Al hacer clic, abre el modal de ese día
+        grid.appendChild(cell); // Añade la celda al calendario
+      }
+    }  
+    const modal = document.getElementById('modal'); // Backdrop del modal
+    const title = document.getElementById('modalTitle'); // Título del modal
+    const closeBtn = document.getElementById('closeBtn'); // Botón cerrar
+    
+    const ejercicioChk = document.getElementById('ejercicioChk'); // Check de ejercicio
+    const vitChk = document.getElementById('vitChk'); // Check vitaminas
+    const creChk = document.getElementById('creChk'); // Check creatina
+    const proChk = document.getElementById('proChk'); // Check proteína
+    const hidChk = document.getElementById('hidChk'); // Check hidratación
+      
+    const ejercicioLabel = document.getElementById('ejercicioLabel'); // Chip de ejercicio
+    const vitLabel = document.getElementById('vitLabel'); // Chip vitaminas
+    const creLabel = document.getElementById('creLabel'); // Chip creatina
+    const proLabel = document.getElementById('proLabel'); // Chip proteína
+    const hidLabel = document.getElementById('hidLabel'); // Chip hidratación
+    const cerealesDots = document.getElementById('cerealesDots'); // Contenedor de 5 puntos
+    const azucarDots = document.getElementById('azucarDots'); // Contenedor de 2 puntos
+    const clearDayBtn = document.getElementById('clearDay'); // Enlace para limpiar el día
+     
+    function buildDots(container, count){ // Construye N botones .dot
+      container.innerHTML = ''; // Limpia contenedor
+      for(let i=0;i<count;i++){ // Repite N veces
+        const b = document.createElement('button'); // Crea un botón
+        b.type = 'button'; // Evita submit
+        b.className = 'dot'; // Estilo .dot
+        b.textContent = i+1; // Muestra 1..N
+        container.appendChild(b); // Añade al contenedor
+      }
+    }
+    buildDots(cerealesDots, 5); // Crea 5 puntos para cereales
+    buildDots(carneDots, 2);
+    buildDots(grasasDots, 5); // Crea 5 puntos para cereales
+    buildDots(verdurasDots, 2);
+    buildDots(azucarDots, 2);
+    function syncLabelStyles(state){ // Pone/quita estilo .done según estado
+      ejercicioLabel.classList.toggle('done', state.ejercicio); // Ejercicio
+      vitLabel.classList.toggle('done', state.suplementos.vitaminas); // Vitaminas
+      creLabel.classList.toggle('done', state.suplementos.creatina); // Creatina
+      proLabel.classList.toggle('done', state.suplementos.proteina); // Proteína
+      hidLabel.classList.toggle('done', state.hidratacion); // Hidratación
+    }
+    function openDayModal(key){ // Abre el modal para una fecha
+      selectedKey = key; // Guarda la clave
+      const date = new Date(key); // Crea fecha desde la clave
+      title.textContent = date.toLocaleDateString('es-ES', { weekday:'long', day:'2-digit', month:'long', year:'numeric' }); // Título legible
+  
+      const state = loadDay(key); // Lee estado
+      ejercicioChk.checked = state.ejercicio; // Sincroniza check
+      vitChk.checked = state.suplementos.vitaminas; // idem vitaminas
+      creChk.checked = state.suplementos.creatina; // idem creatina
+      proChk.checked = state.suplementos.proteina; // idem proteína
+      hidChk.checked = state.hidratacion; // idem hidratación
+  
+      syncLabelStyles(state); // Actualiza estilo de chips
+  
+      [...cerealesDots.children].forEach((el,i)=> el.classList.toggle('on', !!state.dieta.cereales[i])); // 5 puntos
+      [...carneDots.children].forEach((el,i)=> el.classList.toggle('on', !!state.dieta.azucar[i])); // 2 puntos
+      [...grasasDots.children].forEach((el,i)=> el.classList.toggle('on', !!state.dieta.cereales[i])); // 5 puntos
+      [...azucarDots.children].forEach((el,i)=> el.classList.toggle('on', !!state.dieta.azucar[i])); // 2 puntos
+      [...verdurasDots.children].forEach((el,i)=> el.classList.toggle('on', !!state.dieta.cereales[i])); // 5 puntos
+      modal.classList.add('show'); // Muestra el modal
+    }
+      
+    </script>
               
           
       
