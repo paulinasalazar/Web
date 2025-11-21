@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset = "UTF-8" />
-  <meta name="viewport" content = "width-device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title> Calendario </title>
   <style>
     :root {
@@ -17,7 +17,7 @@
     html, body {height:100%}
     body {
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segeo UI Emoji";
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
       background: radial-gradient(1200px 800px at 10% -10%, #1e293b 0, #0b1220 50%, #060b13 100%), var(--bg);
       color: var(--text);
     }
@@ -289,7 +289,6 @@
         const someSup = state.suplementos.vitaminas || state.suplementos.creatina || state.suplementos.proteina;
         supBadge.classList.toggle('ok', allSup);
         supBadge.classList.toggle('warn', someSup && !allSup);
-        supBadge.classList.toggle('warn', !allSup && someSup);
         if(state.hidratacion) hidBadge.classList.add('ok'); else hidBadge.classList.remove('ok');
           
         if (isCompleteDay(state)) cell.classList.add('complete'); else cell.classList.remove('complete');
@@ -319,7 +318,7 @@
     const proChk = document.getElementById('proChk'); // Check proteína
     const hidChk = document.getElementById('hidChk'); // Check hidratación
       
-    const ejercicioLabel = document.getElementById('ejercicioLabel'); // Chip de ejercicio
+    const ejercicioLabel = document.getElementById('ejLabel'); // Chip de ejercicio
     const vitLabel = document.getElementById('vitLabel'); // Chip vitaminas
     const creLabel = document.getElementById('creLabel'); // Chip creatina
     const proLabel = document.getElementById('proLabel'); // Chip proteína
