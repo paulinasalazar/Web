@@ -1,4 +1,156 @@
+<!DOCTYPE html>
 <html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Calendario</title>
+<style>
+:root {
+--bg: #FEFBF8;
+--text: #0b1220;
+--muted: #36454f;
+--ring: #ffd6e8;
+--ok: #22c55e;
+--warn: #f59e0b;
+--day-bg: #ffeaf3;
+}
+* { box-sizing: border-box; }
+body {
+margin: 0;
+background: var(--bg);
+color: var(--text);
+font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica;
+}
+  .container { max-width: 1100px; margin: 32px auto 80px; padding: 0 16px; }
+header { display: flex; align-items: center; justify-content: space-between; }
+
+
+h1 { margin: 0 auto; font-size: 24px; }
+
+
+.btn {
+background: transparent;
+border: 1px solid var(--ring);
+padding: 8px 12px;
+border-radius: 12px;
+cursor: pointer;
+color: var(--text);
+}
+
+
+.calendar {
+background: var(--bg);
+border: 1px solid var(--ring);
+border-radius: 16px;
+padding: 16px;
+}
+  .weekdays, .grid {
+display: grid;
+grid-template-columns: repeat(7, 1fr);
+gap: 10px;
+}
+
+
+.weekdays div {
+text-align: center;
+color: var(--muted);
+font-size: 12px;
+text-transform: uppercase;
+}
+
+
+/* --- DÍAS SIN RUEDITAS --- */
+.day {
+border: 1px solid #f7c5d8;
+background: var(--day-bg);
+border-radius: 10px;
+aspect-ratio: 1/1;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+cursor: pointer;
+transition: 0.2s ease;
+color: var(--text);
+}
+
+
+.day:hover {
+background: #ffd6e8;
+}
+.modal-backdrop {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.4);
+display: none;
+align-items: center;
+justify-content: center;
+padding: 16px;
+z-index: 50;
+}
+
+
+.modal-backdrop.show { display: flex; }
+
+
+.modal {
+width: 100%; max-width: 720px;
+background: #FEFBF8;
+border: 1px solid var(--ring);
+border-radius: 16px;
+padding: 16px;
+}
+
+
+.section { border-top: 1px solid var(--ring); padding: 14px 0; }
+.section h3 { margin: 0 0 10px; font-size: 14px; color: var(--muted); }
+
+
+/* --- CHECKS SIN RECUADRO --- */
+.chk {
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 0;
+border: none !important;
+background: transparent !important;
+}
+  .chk input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--ok); }
+
+
+/* MINI GRID MÁS CERRADO */
+.grid-mini {
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+gap: 4px !important;
+}
+
+
+.dot {
+width: 32px; height: 32px;
+border-radius: 8px;
+border: 1px solid var(--ring);
+display: flex; align-items: center; justify-content: center;
+cursor: pointer;
+font-size: 14px;
+background: transparent;
+}
+
+
+.dot.on { background: rgba(255,182,193,0.45); border-color: #ff9bbb; }
+
+
+</style>
+</head>
+<body>
+  <div class="container">
+<header>
+<h1>Calendario</h1>
+<div class="nav">
+<button class="btn" id="prevMonth">◀</button>
+<div id="monthLabel" class="sub" style="min-width:140px;text-align:center"></div>
+<button class="btn" id="nextMonth">▶</button>
+</div>
 </header>
 
 
@@ -8,8 +160,6 @@
 </div>
 <div class="grid" id="calendarGrid" style="margin-top:10px"></div>
 </div>
-
-
 <!-- MODAL -->
 <div class="modal-backdrop" id="modal">
 <div class="modal">
@@ -65,10 +215,195 @@
 </div>
 </div>
 </div>
-
-
 <script>
-/* Mantengo toda la lógica original sin las rueditas ni recuadros */
+/* ==========================================
+LOGICA COMPLETA — REINSTALADA Y FUNCIONAL
+========================================== */
+
+
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+
+const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+
+let current = new Date();
+current.setDate(1);
+
+
+const calendarGrid = document.getElementById('calendarGrid');
+const monthLabel = document.getElementById('monthLabel');
+
+
+function defaultDay(){
+return {
+ejercicio: false,
+suplementos: { vitaminas: false, creatina: false, proteina: false },
+dieta: {
+cereales: [false,false,false,false,false],
+carnes: [false,false,false,false,false,false,false],
+grasas: [false,false,false,false,false],
+verduras: [false,false,false,false],
+azucar: [false,false]
+},
+hidratacion: false,
+updatedAt: null
+};
+}
+  function storageKey(key){ return 'habit:' + key; }
+function loadDay(key){
+const raw = localStorage.getItem(storageKey(key));
+return raw ? JSON.parse(raw) : defaultDay();
+}
+function saveDay(key, data){
+data.updatedAt = new Date().toISOString();
+localStorage.setItem(storageKey(key), JSON.stringify(data));
+}
+function clearDay(key){ localStorage.removeItem(storageKey(key)); }
+
+
+function weekdayOffset(jsDay){ return (jsDay + 6) % 7; }
+
+
+function renderMonth(){
+const y = current.getFullYear();
+const m = current.getMonth();
+monthLabel.textContent = `${monthNames[m]} ${y}`;
+calendarGrid.innerHTML = '';
+  const first = new Date(y, m, 1);
+const last = new Date(y, m+1, 0);
+
+
+const blanks = weekdayOffset(first.getDay());
+for(let i=0;i<blanks;i++){
+const div = document.createElement('div');
+calendarGrid.appendChild(div);
+}
+
+
+for(let d=1; d<=last.getDate(); d++){
+const cell = document.createElement('button');
+cell.className = 'day';
+const date = new Date(y, m, d);
+const key = ymd(date);
+cell.setAttribute('data-key', key);
+cell.textContent = d;
+cell.addEventListener('click', ()=> openDayModal(key));
+calendarGrid.appendChild(cell);
+}
+}
+  document.getElementById('prevMonth').addEventListener('click', ()=>{
+/* ================= MODAL ================== */
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const closeBtn = document.getElementById('closeBtn');
+const clearDayBtn = document.getElementById('clearDay');
+
+
+const ejercicioChk = document.getElementById('ejercicioChk');
+const vitChk = document.getElementById('vitChk');
+const creChk = document.getElementById('creChk');
+const proChk = document.getElementById('proChk');
+const hidChk = document.getElementById('hidChk');
+
+
+const cerealesDots = document.getElementById('cerealesDots');
+const carnesDots = document.getElementById('carnesDots');
+const grasasDots = document.getElementById('grasasDots');
+const verdurasDots = document.getElementById('verdurasDots');
+const azucarDots = document.getElementById('azucarDots');
+
+
+function buildDots(container, count){
+container.innerHTML = '';
+for(let i=0;i<count;i++){
+const b = document.createElement('button');
+b.type = 'button';
+b.className = 'dot';
+b.dataset.idx = i;
+b.textContent = i+1;
+container.appendChild(b);
+}
+}
+buildDots(cerealesDots, 5);
+buildDots(carnesDots, 7);
+buildDots(grasasDots, 5);
+buildDots(verdurasDots, 4);
+buildDots(azucarDots, 2);
+
+
+let selectedKey = null;
+let selectedState = null;
+
+
+function updateDotsFromState(){
+[...cerealesDots.children].forEach((el,i)=> el.classList.toggle('on', !!selectedState.dieta.cereales[i]));
+[...carnesDots.children].forEach((el,i)=> el.classList.toggle('on', !!selectedState.dieta.carnes[i]));
+[...grasasDots.children].forEach((el,i)=> el.classList.toggle('on', !!selectedState.dieta.grasas[i]));
+[...verdurasDots.children].forEach((el,i)=> el.classList.toggle('on', !!selectedState.dieta.verduras[i]));
+[...azucarDots.children].forEach((el,i)=> el.classList.toggle('on', !!selectedState.dieta.azucar[i]));
+}
+    function attachDotHandlers(){
+const map = [
+{container: cerealesDots, keyPath: ['dieta','cereales']},
+{container: carnesDots, keyPath: ['dieta','carnes']},
+{container: grasasDots, keyPath: ['dieta','grasas']},
+{container: verdurasDots, keyPath: ['dieta','verduras']},
+{container: azucarDots, keyPath: ['dieta','azucar']}
+];
+map.forEach(entry=>{
+[...entry.container.children].forEach(button=>{
+button.onclick = ()=>{
+const idx = Number(button.dataset.idx);
+const arr = entry.keyPath.reduce((o,k)=>o[k], selectedState);
+arr[idx] = !arr[idx];
+button.classList.toggle('on', arr[idx]);
+};
+});
+});
+}
+    attachDotHandlers();
+
+
+function openDayModal(key){
+selectedKey = key;
+selectedState = loadDay(key);
+
+
+const date = new Date(key + 'T00:00:00');
+modalTitle.textContent = date.toLocaleDateString('es-ES', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+
+
+ejercicioChk.checked = !!selectedState.ejercicio;
+vitChk.checked = !!selectedState.suplementos.vitaminas;
+creChk.checked = !!selectedState.suplementos.creatina;
+proChk.checked = !!selectedState.suplementos.proteina;
+hidChk.checked = !!selectedState.hidratacion;
+
+
+updateDotsFromState();
+
+
+modal.classList.add('show');
+}
+
+
+closeBtn.addEventListener('click', ()=>{
+saveDay(selectedKey, selectedState);
+renderMonth();
+modal.classList.remove('show');
+});
+clearDayBtn.addEventListener('click', ()=>{
+if(confirm('¿Borrar datos del día?')){
+clearDay(selectedKey);
+renderMonth();
+modal.classList.remove('show');
+}
+});
+
+
+renderMonth();
 </script>
 
 
