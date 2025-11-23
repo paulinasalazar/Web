@@ -119,7 +119,7 @@ transform: translateY(-2px);
 .grid-mini {
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
-gap: 4px;
+gap:0px;
 }
 
 
@@ -243,8 +243,18 @@ function renderMonth(){
   const y=current.getFullYear(),m=current.getMonth();monthLabel.textContent=`${monthNames[m]} ${y}`;
   calendarGrid.innerHTML='';const first=new Date(y,m,1),last=new Date(y,m+1,0);const blanks=weekdayOffset(first.getDay());
   for(let i=0;i<blanks;i++)calendarGrid.appendChild(document.createElement('div'));
-  for(let d=1;d<=last.getDate();d++){const cell=document.createElement('button');cell.className='day';const date=new Date(y,m,d);
-      const key=ymd(date);cell.dataset.key=key;cell.textContent=d;cell.onclick=()=>openDay(key);calendarGrid.appendChild(cell);}}
+  for(let d=1;d<=last.getDate();d++){const cell=document.createElement('button');cell.className='day';
+       const date=new Date(y,m,d);
+      const key=ymd(date);cell.dataset.key=key;cell.textContent=d;cell.onclick=()=>openDay(key);
+      const state = loadDay(key);
+const supOK = state.suplementos.vitaminas && state.suplementos.creatina && state.suplementos.proteina;
+const fullComplete = state.ejercicio && supOK && state.hidratacion;
+
+if (fullComplete) {
+    cell.style.background = "#d4f8da";  // verde suave
+    cell.style.border = "2px solid #22c55e";
+}
+      calendarGrid.appendChild(cell);}}
 document.getElementById('prevMonth').onclick=()=>{current.setMonth(current.getMonth()-1);renderMonth();};
 document.getElementById('nextMonth').onclick=()=>{current.setMonth(current.getMonth()+1);renderMonth();};
 function makeDots(arr,container,onClick){
