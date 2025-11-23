@@ -9,7 +9,7 @@
       --bg: #FEFBF8;
       --text: #0b1220;
       --muted: #36454f;
-      --ring: #334155;
+      --ring: #ffd6e8;
       --ok: #22c55e;
       --warn: #f59e0b;
     }
@@ -50,7 +50,7 @@
     }
     .btn:hover {border-color: #475569; }
     .calendar{
-      Background: #0b1120;
+      Background: #FEFBF8;
       border: 1px solid var(--ring);
       border-radius: 16px;
       padding: 16px;
@@ -66,7 +66,7 @@
     }
     .day {
       border: 1px solid var(--ring);
-      border-radius: 14px;
+      border-radius: 7px;
       aspect-ratio: 1/1;
       display: flex;
       align-items:flex-start; 
@@ -77,7 +77,7 @@
       cursor: pointer; 
       transition: border-color .2s ease, box-shadow .2s ease, transform .06s ease;
     }
-    .day:hover { border-color: #526581; box-shadow: 0 6px 18px rgba(2,6,23,.35); }
+    .day:hover { border-color: #ffd6e8; box-shadow: 0 6px 18px rgba(2,6,23,.35); }
     .day.disabled { opacity: .3; cursor: default; } 
     .pill { 
       position: absolute; bottom: 8px; left: 8px; 
@@ -85,7 +85,7 @@
     }
     .badge { 
       width: 8px; height: 8px; border-radius: 999px; border: 1px solid var(--ring); 
-      background: #FFD6E8; 
+      background: #FEFBF8; 
     }
   .badge.ok {background: var(--ok); }
   .badge.warn {background: var(--warn); }
@@ -99,7 +99,7 @@
   .modal-backdrop.show { display: flex; }
   .modal {
     width: 100%; max-width: 720px; 
-    background: #FFD6E8; border: 1px solid var(--ring); border-radius: 16px;
+    background: #FEFBF8; border: 1px solid var(--ring); border-radius: 16px;
     box-shadow: 0 24px 60px rgba(0,0,0,.5);
     padding: 16px; 
   }
