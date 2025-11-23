@@ -211,7 +211,7 @@ border-color: #ff9bbb;
 
 
 <script>
-  const pad = n => String(n).padStart(2,'0');
+const pad = n => String(n).padStart(2,'0');
 const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 
 
@@ -239,7 +239,57 @@ function loadDay(k){let r=localStorage.getItem(storageKey(k));return r?JSON.pars
 function saveDay(k,d){localStorage.setItem(storageKey(k),JSON.stringify(d));}
 function clearDay(k){localStorage.removeItem(storageKey(k));}
 function weekdayOffset(js){return(js+6)%7;}
-function renderMonth(){const y=current.getFullYear(),m=current.getMonth();monthLabel.textContent=`${monthNames[m]} ${y}`;calendarGrid.innerHTML='';const first=new Date(y,m,1),last=new Date(y,m+1,0);const blanks=weekdayOffset(first.getDay());for(let i=0;i<blanks;i++)calendarGrid.appendChild(document.createElement('div'));for(let d=1;d<=last.getDate();d++){const cell=document.createElement('button');cell.className='day';const date=new Date(y,m,d);const key=ymd(date);cell.dataset.key=key;cell.textContent=d;cell.onclick=()=>openDay(key);calendarGrid.appendChild(cell);}}
+function renderMonth(){
+  const y=current.getFullYear(),m=current.getMonth();monthLabel.textContent=`${monthNames[m]} ${y}`;
+  calendarGrid.innerHTML='';const first=new Date(y,m,1),last=new Date(y,m+1,0);const blanks=weekdayOffset(first.getDay());
+  for(let i=0;i<blanks;i++)calendarGrid.appendChild(document.createElement('div'));
+  for(let d=1;d<=last.getDate();d++){const cell=document.createElement('button');cell.className='day';const date=new Date(y,m,d);
+      const key=ymd(date);cell.dataset.key=key;cell.textContent=d;cell.onclick=()=>openDay(key);calendarGrid.appendChild(cell);}}
 document.getElementById('prevMonth').onclick=()=>{current.setMonth(current.getMonth()-1);renderMonth();};
 document.getElementById('nextMonth').onclick=()=>{current.setMonth(current.getMonth()+1);renderMonth();};
-const modal=document.get
+function makeDots(arr,container,onClick){
+container.innerHTML='';
+arr.forEach((v,i)=>{
+const dot=document.createElement('div');
+dot.className='dot'+(v?' on':'');
+dot.textContent=i+1;
+dot.onclick=()=>onClick(i);
+container.appendChild(dot);
+});
+}
+
+
+let activeKey=null;
+function openDay(key){
+activeKey=key;
+const d=loadDay(key);
+modalTitle.textContent=key;
+
+
+makeDots(d.dieta.cereales,document.getElementById('cerealesDots'),i=>{d.dieta.cereales[i]=!d.dieta.cereales[i];saveDay(key,d);openDay(key);});
+makeDots(d.dieta.carnes,document.getElementById('carnesDots'),i=>{d.dieta.carnes[i]=!d.dieta.carnes[i];saveDay(key,d);openDay(key);});
+makeDots(d.dieta.grasas,document.getElementById('grasasDots'),i=>{d.dieta.grasas[i]=!d.dieta.grasas[i];saveDay(key,d);openDay(key);});
+makeDots(d.dieta.verduras,document.getElementById('verdurasDots'),i=>{d.dieta.verduras[i]=!d.dieta.verduras[i];saveDay(key,d);openDay(key);});
+makeDots(d.dieta.azucar,document.getElementById('azucarDots'),i=>{d.dieta.azucar[i]=!d.dieta.azucar[i];saveDay(key,d);openDay(key);});
+  document.getElementById('vitChk').checked=d.suplementos.vitaminas;
+document.getElementById('creChk').checked=d.suplementos.creatina;
+document.getElementById('proChk').checked=d.suplementos.proteina;
+document.getElementById('ejercicioChk').checked=d.ejercicio;
+document.getElementById('hidChk').checked=d.hidratacion;
+
+
+modal.classList.add('show');
+}
+ document.getElementById('vitChk').onchange=()=>{let d=loadDay(activeKey);d.suplementos.vitaminas=!d.suplementos.vitaminas;saveDay(activeKey,d);};
+document.getElementById('creChk').onchange=()=>{let d=loadDay(activeKey);d.suplementos.creatina=!d.suplementos.creatina;saveDay(activeKey,d);};
+document.getElementById('proChk').onchange=()=>{let d=loadDay(activeKey);d.suplementos.proteina=!d.suplementos.proteina;saveDay(activeKey,d);};
+document.getElementById('ejercicioChk').onchange=()=>{let d=loadDay(activeKey);d.ejercicio=!d.ejercicio;saveDay(activeKey,d);};
+document.getElementById('hidChk').onchange=()=>{let d=loadDay(activeKey);d.hidratacion=!d.hidratacion;saveDay(activeKey,d);};
+
+
+document.getElementById('closeBtn').onclick=()=>modal.classList.remove('show');
+document.getElementById('clearDay').onclick=()=>{clearDayData(activeKey);modal.classList.remove('show');};
+
+
+renderMonth();
+</script> 
